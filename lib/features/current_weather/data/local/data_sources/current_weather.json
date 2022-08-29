@@ -1,0 +1,43 @@
+{
+  "coord": {
+    "lon": -75.5299,
+    "lat": 40.6801
+  },
+  "weather": [
+    {
+      "id": 741,
+      "main": "Fog",
+      "description": "fog",
+      "icon": "50n"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 291.68,
+    "feels_like": 292.12,
+    "temp_min": 290.27,
+    "temp_max": 293.42,
+    "pressure": 1007,
+    "humidity": 97
+  },
+  "visibility": 402,
+  "wind": {
+    "speed": 0,
+    "deg": 0
+  },
+  "clouds": {
+    "all": 100
+  },
+  "dt": 1661246195,
+  "sys": {
+    "type": 2,
+    "id": 2002445,
+    "country": "US",
+    "sunrise": 1661250031,
+    "sunset": 1661298562
+  },
+  "timezone": -14400,
+  "id": 5188351,
+  "name": "Egypt",
+  "cod": 200
+}
