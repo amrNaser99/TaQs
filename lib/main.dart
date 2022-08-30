@@ -13,10 +13,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DioHelper.init();
   await CacheHelper.init();
+  await CacheHelper.getCacheData().then((value) {
+    debugPrint('CacheData Loaded Successfully');
+  });
   Bloc.observer = MyBlocObserver();
-
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
 
   runApp(MyApp());
 }
@@ -27,8 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => AppCubit()
-        ..getCacheData()..getPosition()..GetCurrentWeatherByQue(),
+      create: (BuildContext context) => AppCubit(),
       child: BlocConsumer<AppCubit, AppState>(
         listener: (context, state) {},
         builder: (context, state) {

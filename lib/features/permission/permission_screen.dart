@@ -6,6 +6,7 @@ import 'package:taQs/bloc/app_cubit.dart';
 import 'package:taQs/bloc/app_state.dart';
 import 'package:taQs/core/colors.dart';
 import 'package:taQs/core/components/components.dart';
+import 'package:taQs/core/constants.dart';
 import 'package:taQs/features/home/presentation/home_screen.dart';
 
 class PermissionScreen extends StatefulWidget {
@@ -16,45 +17,39 @@ class PermissionScreen extends StatefulWidget {
 }
 
 class _PermissionScreenState extends State<PermissionScreen> {
+  initState()  {
+    super.initState();
+     BlocProvider.of<AppCubit>(context)
+        .GetCurrentWeatherByLatLng()
+        .then((value) {
+      debugPrint('GetCurrentWeatherByLatLng Success');
+    }).catchError((error) {
+      debugPrint('GetCurrentWeatherByLatLng Error : ${error.toString()}');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppState>(
       listener: (context, state) {
-        if (state is TaqsEnableLocationSuccessState) {
+        if (state is TaqsGetCurrentWeatherSuccessState ||
+            permissionsGranted == true && BlocProvider.of<AppCubit>(context).currentWeather != null) {
           NavigateAndFinish(context, HomeScreen());
-        } else if (state is TaqsGetPositionLoadingState || state is TaqsEnableLocationLoadingState || state is TaqsGetCurrentWeatherLoadingState || state is TaqsGetCacheDataLoadingState) {
-          showLoading(context);
-        } else if (state is TaqsGetPositionErrorState) {
+        }
+        // else if (state is TaqsGetPositionLoadingState ||
+        //     state is TaqsEnableLocationLoadingState ||
+        //     state is TaqsGetCurrentWeatherLoadingState ||
+        //     state is TaqsGetCacheDataLoadingState) {
+        //   showLoading(context);
+        // }
+        else if (state is TaqsGetPositionErrorState) {
           showError(context, state.error);
+        } else if (state is TaqsEnableLocationSuccessState && permissionsGranted == true){
+          BlocProvider.of<AppCubit>(context).GetCurrentWeatherByLatLng();
         }
       },
       builder: (context, state) {
-        AppCubit cubit = BlocProvider.of<AppCubit>(context);
 
-        /// Skip Icon
-        /*
-        Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    NavigateTo(
-                      context,
-                      HomeScreen(),
-                    );
-                  },
-                  icon: Text(
-                    'SKIP',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              )
-         */
         return SafeArea(
           child: Scaffold(
             body: SafeArea(
@@ -121,9 +116,9 @@ class _PermissionScreenState extends State<PermissionScreen> {
                             children: [
                               ConditionalBuilder(
                                 condition:
-                                    state != TaqsEnableLocationLoadingState(),
+                                    state is! TaqsEnableLocationLoadingState,
                                 builder: (context) {
-                                  if (cubit.permissionsGranted == false) {
+                                  if (permissionsGranted == false) {
                                     return MaterialButton(
                                       color: Colors.blueAccent[400],
                                       textColor: Colors.white,
@@ -174,5 +169,4 @@ class _PermissionScreenState extends State<PermissionScreen> {
       },
     );
   }
-
 }

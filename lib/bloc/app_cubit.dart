@@ -3,11 +3,13 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:taQs/bloc/app_state.dart';
+import 'package:taQs/core/constants.dart';
 import 'package:taQs/core/end_point.dart';
 import 'package:taQs/core/services/network/local/cache_helper.dart';
 import 'package:taQs/core/services/network/remote/dio_helper.dart';
 import 'package:taQs/features/current_weather/data/local/models/current_weather.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:taQs/features/next_days_forecast/data/models/next_daily_forecast.dart';
 
 class AppCubit extends Cubit<AppState> {
   AppCubit() : super(TaqsInitState());
@@ -23,7 +25,7 @@ class AppCubit extends Cubit<AppState> {
   Future<void> GetCurrentWeatherByQue() async {
     emit(TaqsGetCurrentWeatherLoadingState());
     DioHelper.getData(
-      url: baseUrl+CURRENTWEATHER,
+      url: baseUrl + CURRENTWEATHER,
       query: {
         'q': 'zagazig',
         'lang': 'en',
@@ -41,30 +43,89 @@ class AppCubit extends Cubit<AppState> {
     });
   }
 
-  //get weather api using lat and long
-  Future<void> GetCurrentWeatherByLatLong(double lat, double long) async {
-    emit(TaqsGetCurrentWeatherLoadingState());
-    DioHelper.getData(
-      url: baseUrl+CURRENTWEATHER,
-      query: {
-        'lat': lat.toString(),
-        'lon': long.toString(),
-        'lang': 'en',
-        'appid': '2e9497eaa205d973a3c0d8a08107d55c',
-      },
-      token: apiKey,
-    ).then((value) {
-      debugPrint('value: ${value.data.toString()}');
-      currentWeather = CurrentWeather.fromJson(value.data);
-      debugPrint('currentWeather: ${currentWeather}');
+  Position? position;
+  String? positionLat;
+  String? positionLong;
 
-      emit(TaqsGetCurrentWeatherSuccessState());
+  //get weather api using lat and long
+
+  // Future<void> GetCurrentWeatherByLatLng({
+
+  //get weather api using lat and long
+
+  //get weather api using city name
+
+  // Future<void> GetCurrentWeatherByLatLng() async {
+
+  // bool permissionsGranted = false;
+
+  Future enableLocation() async {
+    emit(TaqsEnableLocationLoadingState());
+
+    checkGPSEnabled().then((value) {
+      checkLocationPermission().then((value) {
+        debugPrint('TaqsGetPositionLoadingState');
+        emit(TaqsGetPositionLoadingState());
+        getPosition().then((value) {
+          debugPrint('TaqsGetPositionSuccessState');
+          emit(TaqsGetPositionSuccessState());
+
+          permissionsGranted = true;
+          emit(TaqsEnableLocationSuccessState());
+        }).catchError((error) {
+          debugPrint(error.toString());
+          emit(TaqsGetPositionErrorState(error));
+        });
+      }).catchError((error) {
+        debugPrint('error: ${error}');
+      });
     }).catchError((error) {
-      emit(TaqsGetCurrentWeatherErrorState(error));
+      debugPrint('error: ${error}');
     });
   }
 
-  // Future<void> GetCurrentWeatherByLatLng({
+  //   emit(TaqsGetCurrentWeatherByLatLngLoadingState());
+  //   debugPrint('lat in GetCurrentWeatherByLatLng: ${positionLat} lon in GetCurrentWeatherByLatLng: ${positionLong}');
+  //   DioHelper.getData(
+  //     // url: baseU,
+  //     url: baseUrl + CURRENTWEATHER,
+  //     query: {
+  //       'lat': {positionLat},
+  //       'lon': {positionLong},
+  //       // 'lang': 'en',
+  //       'appid': apiKey,
+  //     },
+  //     token: apiKey,
+  //   ).then((value) {
+  //     debugPrint('value: ${value.data.toString()}');
+  //     currentWeather = CurrentWeather.fromJson(value.data);
+  //     debugPrint('currentWeather: ${currentWeather}');
+  //
+  //     emit(TaqsGetCurrentWeatherByLatLngSuccessState());
+  //   }).catchError((error) {
+  //     emit(TaqsGetCurrentWeatherByLatLngErrorState(error));
+  //   });
+  // }
+// Future<void> GetCurrentWeatherByCityName(String cityName) async {
+//     emit(TaqsGetCurrentWeatherLoadingState());
+//     DioHelper.getData(
+//       url: baseUrl + CURRENTWEATHER,
+//       query: {
+//         'q': cityName,
+//         'lang': 'en',
+//         'appid': '2e9497eaa205d973a3c0d8a08107d55c',
+//       },
+//       token: apiKey,
+//     ).then((value) {
+//       debugPrint('value: ${value.data.toString()}');
+//       currentWeather = CurrentWeather.fromJson(value.data);
+//       debugPrint('currentWeather: ${currentWeather}');
+//
+//       emit(TaqsGetCurrentWeatherSuccessState());
+//     }).catchError((error) {
+//       emit(TaqsGetCurrentWeatherErrorState(error));
+//     });
+//   }
   //   required dynamic lat,
   //   required dynamic lon,
   // }) async {
@@ -83,57 +144,29 @@ class AppCubit extends Cubit<AppState> {
   //     emit(TaqsGetCurrentWeatherErrorState(error));
   //   });
   // }
+  //   emit(TaqsGetCurrentWeatherLoadingState());
+  //   DioHelper.getData(
+  //     url: baseUrl + CURRENTWEATHER,
+  //     query: {
+  //       'lat': lat.toString(),
+  //       'lon': long.toString(),
+  //       'lang': 'en',
+  //       'appid': '2e9497eaa205d973a3c0d8a08107d55c',
+  //     },
+  //     token: apiKey,
+  //   ).then((value) {
+  //     debugPrint('value: ${value.data.toString()}');
+  //     currentWeather = CurrentWeather.fromJson(value.data);
+  //     debugPrint('currentWeather: ${currentWeather}');
+  //
+  //     emit(TaqsGetCurrentWeatherSuccessState());
+  //   }).catchError((error) {
+  //     emit(TaqsGetCurrentWeatherErrorState(error));
+  //   });
+  // }
+  //get current weather by location
 
-  Future<void> GetCurrentWeatherByLatLng({
-    required dynamic lat,
-    required dynamic lon,
-  }) async {
-    emit(TaqsGetCurrentWeatherByLatLngLoadingState());
-    DioHelper.getData(
-      url: baseUrl+CURRENTWEATHER,
-      query: {
-        'lat': {lat}.toString(),
-        'lon': {lon}.toString(),
-        'lang': 'en',
-        'appid': '2e9497eaa205d973a3c0d8a08107d55c',
-      },
-      token: apiKey,
-    ).then((value) {
-      debugPrint('value: ${value.data.toString()}');
-      currentWeather = CurrentWeather.fromJson(value.data);
-      debugPrint('currentWeather: ${currentWeather}');
-
-      emit(TaqsGetCurrentWeatherByLatLngSuccessState());
-    }).catchError((error) {
-      emit(TaqsGetCurrentWeatherByLatLngErrorState(error));
-    });
-  }
-
-  Position? position;
-
-  Future enableLocation() async {
-    emit(TaqsEnableLocationLoadingState());
-
-    checkGPSEnabled().then((value) {
-      checkLocationPermission().then((value) {
-        debugPrint('TaqsGetPositionLoadingState');
-        emit(TaqsGetPositionLoadingState());
-        getPosition().then((value) {
-          debugPrint('TaqsGetPositionSuccessState');
-          emit(TaqsGetPositionSuccessState());
-
-          emit(TaqsEnableLocationSuccessState());
-        }).catchError((error) {
-          debugPrint(error.toString());
-          emit(TaqsGetPositionErrorState(error));
-        });
-      }).catchError((error) {
-        debugPrint('error: ${error}');
-      });
-    }).catchError((error) {
-      debugPrint('error: ${error}');
-    });
-  }
+  // Future<void> GetCurrentWeatherByLatLong(double lat, double long) async {
 
   Future checkGPSEnabled() async {
     bool serviceStatus = await Geolocator.isLocationServiceEnabled();
@@ -171,20 +204,6 @@ class AppCubit extends Cubit<AppState> {
     }
   }
 
-  bool permissionsGranted = false;
-  bool once = true;
-
-  Future getCacheData() async {
-    emit(TaqsGetCacheDataLoadingState());
-    if (once == false) {
-      permissionsGranted = await CacheHelper.getData(key: 'permissionsGranted');
-      debugPrint('permissionsGranted: ${permissionsGranted.toString()}');
-    } else {
-      once = false;
-    }
-    emit(TaqsGetCacheDataSuccessState());
-  }
-
   Future<bool> checkInterNetConnection() async {
     bool result = await InternetConnectionChecker().hasConnection;
     if (result == true) {
@@ -199,14 +218,77 @@ class AppCubit extends Cubit<AppState> {
     position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     ).then((value) {
-      // lon = value.longitude;
-      // lat = value.latitude;
       debugPrint('position: ${value}');
-      // debugPrint('lat: ${lat}');
-      // debugPrint('lon: ${lon}');
-      emit(TaqsEnableLocationSuccessState());
+      positionLat = value.latitude.toString();
+      positionLong = value.longitude.toString();
+      debugPrint('positionLat: ${value.latitude.toString()}');
+      debugPrint('positionLong: ${value.longitude.toString()}');
+      CacheHelper.saveData(key: 'positionLat', value: positionLat)
+          .then((value) {
+        debugPrint('positionLat ${positionLat} saved in cache Successfully');
+      }).catchError((error) {
+        debugPrint('positionLong Failed to save in cache : ${error}');
+      });
+      CacheHelper.saveData(key: 'positionLong', value: positionLong)
+          .then((value) {
+        debugPrint('positionLong ${positionLong} saved in cache Successfully');
+      }).catchError((error) {
+        debugPrint('positionLong Failed to save in cache : ${error}');
+      });
+      emit(TaqsGetPositionSuccessState());
     }).catchError((error) {
-      emit(TaqsEnableLocationErrorState(error));
+      emit(TaqsGetPositionErrorState(error));
+    });
+  }
+
+  Future<void> GetCurrentWeatherByLatLng() async {
+    emit(TaqsGetCurrentWeatherLoadingState());
+    Position? position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    debugPrint('position: ${position}');
+    CacheHelper.saveData(
+        key: 'positionLat', value: position.latitude.toString());
+    CacheHelper.saveData(
+        key: 'positionLong', value: position.longitude.toString());
+    DioHelper.getData(
+      url: baseUrl + CURRENTWEATHER,
+      query: {
+        'lat': position.latitude.toString(),
+        'lon': position.longitude.toString(),
+        'lang': 'en',
+        'appid': '2e9497eaa205d973a3c0d8a08107d55c',
+      },
+      token: apiKey,
+    ).then((value) {
+      debugPrint('value: ${value.data.toString()}');
+      currentWeather = CurrentWeather.fromJson(value.data);
+      debugPrint('currentWeather: ${currentWeather}');
+
+      emit(TaqsGetCurrentWeatherSuccessState());
+    }).catchError((error) {
+      emit(TaqsGetCurrentWeatherErrorState(error));
+    });
+  }
+
+  NextDailyForecast? nextDailyForecast;
+
+  Future<void> GetNextFiveDaysWeatherByLatLng() async {
+    emit(TaqsGetNextFiveDaysWeatherByLatLngLoadingState());
+    DioHelper.getData(
+      url: baseUrl + NEXT5DAYS,
+      query: {
+        'lat': positionLat,
+        'lon': positionLong,
+        'cnt': '7',
+        'appid': apiKey,
+      },
+      token: apiKey,
+    ).then((value) {
+      nextDailyForecast = NextDailyForecast.fromJson(value.data);
+      debugPrint('nextDailyForecast: ${nextDailyForecast}');
+      emit(TaqsGetNextFiveDaysWeatherByLatLngSuccessState());
+    }).catchError((error) {
+      emit(TaqsGetNextFiveDaysWeatherByLatLngErrorState(error));
     });
   }
 

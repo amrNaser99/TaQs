@@ -1,3 +1,4 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,6 +33,7 @@ class HomeScreen extends StatelessWidget {
           rtlOpening: false,
           child: Scaffold(
             backgroundColor: Colors.white,
+            // backgroundColor: Colors.white,
             appBar: AppBar(
               leading: Padding(
                 padding: const EdgeInsetsDirectional.only(
@@ -46,10 +48,33 @@ class HomeScreen extends StatelessWidget {
                       color: colorPrimary,
                     )),
               ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    end: 8.0,
+                  ),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.search_rounded,
+                      color: colorPrimary,
+                      size: 28,
+                    ),
+                  ),
+                )
+              ],
             ),
-            body: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: HomeBody(),
+            body: ConditionalBuilder(
+              condition: cubit.currentWeather != null,
+              builder: (context) => SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: HomeBody(),
+              ),
+              fallback: (context) => Center(
+                child: CircularProgressIndicator(
+                  color: Colors.blueAccent[900],
+                ),
+              ),
             ),
           ),
           drawer: HomeDrawer(currentWidget: cubit.currentWeather),

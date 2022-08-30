@@ -51,3 +51,12 @@ class TaqsGetCacheDataErrorState extends AppState {
 
   TaqsGetCacheDataErrorState(this.error);
 }
+class TaqsGetNextFiveDaysWeatherByLatLngLoadingState extends AppState {}
+
+class TaqsGetNextFiveDaysWeatherByLatLngSuccessState extends AppState {}
+
+class TaqsGetNextFiveDaysWeatherByLatLngErrorState extends AppState {
+  final String error;
+
+  TaqsGetNextFiveDaysWeatherByLatLngErrorState(this.error);
+}

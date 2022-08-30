@@ -7,7 +7,6 @@ Widget defaultButton({
   required void Function() function,
   bool isUpperCase = true,
   var padding = EdgeInsets.zero,
-
 }) =>
     Padding(
       padding: padding,
@@ -30,18 +29,15 @@ Widget defaultButton({
       ),
     );
 
-void NavigateTo(context, Widget) =>
-    Navigator.push(
+void NavigateTo(context, Widget) => Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Widget,
       ),
     );
 
-void NavigateAndFinish(context, Widget) =>
-    Navigator.pushAndRemoveUntil(
-        context, MaterialPageRoute(builder: (context) => Widget), (
-        route) => false);
+void NavigateAndFinish(context, Widget) => Navigator.pushAndRemoveUntil(
+    context, MaterialPageRoute(builder: (context) => Widget), (route) => false);
 
 Widget defaultTextButton({
   required Function()? onPressed,
@@ -55,7 +51,6 @@ Widget defaultTextButton({
       ),
     );
 
-
 void showLoading(BuildContext context) {
   showDialog(
     barrierColor: Colors.transparent,
@@ -68,7 +63,16 @@ void showLoading(BuildContext context) {
           height: 100,
           width: 100,
           child: Center(
-            child: CircularProgressIndicator(),
+            child: Column(
+              children: [
+                Text(
+                  'Please Wait',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10,),
+                CircularProgressIndicator(),
+              ],
+            ),
           ),
         ),
       );
@@ -108,8 +112,7 @@ void showError(BuildContext context, String error) {
 //       fontSize: 16.0);
 // }
 
-Widget myDivider() =>
-    Padding(
+Widget myDivider() => Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 15.0,
       ),
@@ -119,4 +122,3 @@ Widget myDivider() =>
         color: Colors.grey[300],
       ),
     );
-
