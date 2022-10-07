@@ -4,7 +4,7 @@ A new Weather App Project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+In this project I created a React weather app, which uses an API from openweathermap to get weather information all over the world. By default it displays the local weather at Helsinki. You can use locate button to get weather data at your location. You can also use search to find the current weather at a city, for example London or Paris. The app displays local temperature, gives you a brief description and also shows an icon based on the weather..
 
 A few resources to get you started if this is your first Flutter project:
 
